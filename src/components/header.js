@@ -1,9 +1,25 @@
-import {AiOutlineSearch} from "react-icons/ai"
+import {AiOutlineSearch, AiOutlineUpload} from "react-icons/ai"
+import {auth} from "@/lib/firebase";
+import {useEffect, useState} from "react";
 
-export default function Header({showLogin, setShowLogin}) {
+export default function Header({setShowLogin, setShowVideoUpload}) {
+
+    const [user, setUser] = useState(null);
+
+    useEffect(() => {
+        const unsubscribe = auth.onAuthStateChanged((user) => {
+            setUser(user);
+        });
+
+        return () => unsubscribe();
+    }, []);
 
     function handleLoginClick() {
-        setShowLogin(!showLogin)
+        setShowLogin(true)
+    }
+
+    function handleUploadClick() {
+        setShowVideoUpload(true)
     }
 
     return (
@@ -19,10 +35,22 @@ export default function Header({showLogin, setShowLogin}) {
                     </button>
                 </form>
             </div>
-            <div className={"pr-2 flex justify-center items-center"}>
-                <button onClick={handleLoginClick} className={"bg-discordGrey-light p-2 px-4 rounded-lg text-blue-500 text-opacity-60 hover:text-opacity-100 hover:bg-slate-300"}>
-                    Sign In
-                </button>
+            <div className={" flex justify-center items-center"}>
+                {user ?
+                    <div className={"flex items-center gap-2"}>
+                        <button onClick={handleUploadClick} className={"flex items-center justify-center px-2 w-fit h-fit "}>
+                            <AiOutlineUpload className={"w-6 h-6 text-slate-300 hover:text-blue-500"}/>
+                        </button>
+                        <button className={"bg-discordGrey-light h-10 w-10 rounded-full px-2"}>
+                            {auth.currentUser.displayName[0]}
+                        </button>
+                    </div>
+                    :
+                    <button onClick={handleLoginClick} className={"bg-discordGrey-light p-2 px-4 rounded-lg text-blue-500 text-opacity-60 hover:text-opacity-100 hover:bg-slate-300"}>
+                        Sign In
+                    </button>
+                }
+
             </div>
 
         </div>
